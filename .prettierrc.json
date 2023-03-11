@@ -1,0 +1,10 @@
+{
+  "endOfLine": "lf",
+  "semi": true,
+  "useTabs": true,
+  "vueIndentScriptAndStyle": true,
+  "singleQuote": true,
+  "bracketSameLine": true,
+  "editorconfig": true,
+  "tabWidth": 2
+}
