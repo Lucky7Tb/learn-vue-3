@@ -1,5 +1,6 @@
 <script setup lang="ts">
 	import { useRoute } from 'vue-router';
+	import Navbar from '../components/Navbar.vue';
 	import useMovieStore from '../stores/MovieStore';
 
 	const store = useMovieStore();
@@ -16,6 +17,7 @@
 
 <template>
 	<div>
+		<Navbar></Navbar>
 		<div id="movie-preview">
 			<div id="movie-container">
 				<div id="movie-poster">
