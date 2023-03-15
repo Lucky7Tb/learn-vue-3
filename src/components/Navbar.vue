@@ -1,6 +1,6 @@
 <script setup lang="ts">
 	import useMovieStore from '../stores/MovieStore';
-	import { useRoute } from 'vue-router';
+	import { useRoute, RouterLink } from 'vue-router';
 	import { ref } from 'vue';
 	const store = useMovieStore();
 	const route = useRoute();
@@ -14,7 +14,9 @@
 <template>
 	<div id="navbar-wrap" class="card-shadow">
 		<div id="navbar">
-			<h2>Movei.io</h2>
+			<RouterLink to="/">
+				<h2>Movei.io</h2>
+			</RouterLink>
 			<div v-if="route.path === '/'">
 				<input
 					v-model="searchKeyword"

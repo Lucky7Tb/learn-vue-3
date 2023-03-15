@@ -6,7 +6,8 @@
 	function closeModal(event: MouseEvent) {
 		if (
 			(event.target as Element).className === 'modal-mask' ||
-			(event.target as Element).className === 'modal-wrapper'
+			(event.target as Element).className === 'modal-wrapper' ||
+			(event.target as Element).id === 'btn-close'
 		) {
 			emit('closeModal', false);
 		}
@@ -25,6 +26,7 @@
 						<slot name="body"></slot>
 					</div>
 					<div class="modal-footer">
+						<button @click="closeModal" id="btn-close">Close</button>
 						<slot name="footer">
 							<div></div>
 						</slot>
