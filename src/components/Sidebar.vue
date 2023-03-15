@@ -1,11 +1,30 @@
 <script setup lang="ts">
+	import { reactive, ref } from 'vue';
 	import Filters from './Filters.vue';
+	import Modal from './Modal.vue';
 	import useMovieStore from '../stores/MovieStore';
 	const store = useMovieStore();
+
+	const isShowModal = ref(false);
+	const form = reactive({
+		name: '',
+		year: '',
+		rating: '',
+		genre: '',
+		budget: '',
+		boxOffice: '',
+		poster: '',
+		actors: [{ name: '' }],
+		storyLine: '',
+	});
 
 	function clearFilter() {
 		store.filter.key = '';
 		store.filter.order = 'asc';
+	}
+
+	function toggleModal() {
+		isShowModal.value = !isShowModal.value;
 	}
 </script>
 
@@ -13,7 +32,9 @@
 	<div id="sidebar">
 		<Filters></Filters>
 		<button @click="clearFilter">Clear Filter</button>
-		<button>Add movie</button>
+		<button @click="toggleModal">Add movie</button>
+
+		<Modal v-if="isShowModal" v-on:close-modal="toggleModal"></Modal>
 	</div>
 </template>
 

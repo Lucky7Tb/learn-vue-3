@@ -1,3 +1,40 @@
+<script setup lang="ts">
+	import { defineEmits } from 'vue';
+
+	const emit = defineEmits(['closeModal']);
+
+	function closeModal(event: MouseEvent) {
+		if (
+			(event.target as Element).className === 'modal-mask' ||
+			(event.target as Element).className === 'modal-wrapper'
+		) {
+			emit('closeModal', false);
+		}
+	}
+</script>
+
+<template>
+	<Transition name="modal">
+		<div class="modal-mask" @click="closeModal">
+			<div class="modal-wrapper">
+				<div class="modal-container">
+					<div class="modal-header">
+						<slot name="header"></slot>
+					</div>
+					<div class="modal-body">
+						<slot name="body"></slot>
+					</div>
+					<div class="modal-footer">
+						<slot name="footer">
+							<div></div>
+						</slot>
+					</div>
+				</div>
+			</div>
+		</div>
+	</Transition>
+</template>
+
 <style lang="scss">
 	.modal-mask {
 		position: fixed;
