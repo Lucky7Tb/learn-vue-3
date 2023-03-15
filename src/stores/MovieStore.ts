@@ -1,4 +1,16 @@
-import { defineStore, setActivePinia } from 'pinia';
+import { defineStore } from 'pinia';
+
+interface IMovie {
+	name: string;
+	genre: string;
+	rating: number;
+	year: number;
+	budget: string;
+	boxOffice: string;
+	poster: string;
+	actors: Record<'name', string>[];
+	storyline: string;
+}
 
 export default defineStore('movieStore', {
 	state: () => {
@@ -292,6 +304,22 @@ export default defineStore('movieStore', {
 		},
 		getMovieById: (state) => (id: number) => {
 			return state.movies.filter((movie) => movie.id === id)[0];
+		},
+	},
+	actions: {
+		addMovie(movie: IMovie) {
+			this.movies.push({
+				...movie,
+				id: this.movies[this.movies.length - 1].id + 1,
+			});
+		},
+		updateMovie(movieId: number, movie: IMovie) {
+			const indexMovie = this.movies.findIndex((movie) => movie.id === movieId);
+			this.movies[indexMovie] = { ...this.movies[indexMovie], ...movie };
+		},
+		deleteMovie(movieId: number) {
+			const indexMovie = this.movies.findIndex((movie) => movie.id === movieId);
+			this.movies.splice(indexMovie, 1);
 		},
 	},
 });

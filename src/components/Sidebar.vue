@@ -5,6 +5,7 @@
 	import useMovieStore from '../stores/MovieStore';
 	const store = useMovieStore();
 
+	const movieForm = ref<HTMLFormElement | null>(null);
 	const isShowModal = ref(false);
 	const form = reactive({
 		name: '',
@@ -15,7 +16,7 @@
 		boxOffice: '',
 		poster: '',
 		actors: [{ name: '' }],
-		storyLine: '',
+		storyline: '',
 	});
 
 	function clearFilter() {
@@ -26,6 +27,19 @@
 	function toggleModal() {
 		isShowModal.value = !isShowModal.value;
 	}
+
+	function addActor() {
+		form.actors.push({ name: '' });
+	}
+
+	function addMovie() {
+		store.addMovie({
+			...form,
+			year: parseInt(form.year),
+			rating: parseInt(form.rating),
+		});
+		toggleModal();
+	}
 </script>
 
 <template>
@@ -34,7 +48,73 @@
 		<button @click="clearFilter">Clear Filter</button>
 		<button @click="toggleModal">Add movie</button>
 
-		<Modal v-if="isShowModal" v-on:close-modal="toggleModal"></Modal>
+		<Modal v-if="isShowModal" v-on:close-modal="toggleModal">
+			<template v-slot:header>
+				<h3 class="m-0">Create new movie</h3>
+			</template>
+			<template v-slot:body>
+				<form @submit.prevent="addMovie" ref="movieForm" id="movie-form">
+					<p>Fill out the details bellow</p>
+					<input required v-model="form.name" type="text" placeholder="Name" />
+					<input
+						required
+						v-model="form.year"
+						type="number"
+						placeholder="Year" />
+					<input
+						required
+						v-model="form.rating"
+						type="number"
+						placeholder="Rating" />
+					<input
+						required
+						v-model="form.genre"
+						type="text"
+						placeholder="Genre" />
+					<input
+						required
+						v-model="form.budget"
+						type="text"
+						placeholder="Budget" />
+					<input
+						required
+						v-model="form.boxOffice"
+						type="text"
+						placeholder="Box Office" />
+					<input
+						required
+						v-model="form.poster"
+						type="text"
+						placeholder="Poster" />
+					<hr />
+					<div>
+						<div id="actor-input">
+							<p class="m-0">Actors</p>
+							<span @click="addActor" class="add-actor">+</span>
+						</div>
+
+						<input
+							required
+							v-for="(_, index) in form.actors"
+							:key="index"
+							v-model="form.actors[index].name"
+							type="text"
+							placeholder="Actor" />
+					</div>
+
+					<hr />
+
+					<textarea
+						required
+						v-model="form.storyline"
+						placeholder="storyline"
+						rows="6"></textarea>
+				</form>
+			</template>
+			<template v-slot:footer>
+				<button id="add-movie" @click="movieForm!.requestSubmit()">Add</button>
+			</template>
+		</Modal>
 	</div>
 </template>
 
@@ -60,7 +140,6 @@
 			border-radius: 10px;
 			outline: none;
 			cursor: pointer;
-			color: white;
 		}
 
 		#movie-form {

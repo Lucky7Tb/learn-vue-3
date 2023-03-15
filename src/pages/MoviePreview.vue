@@ -1,17 +1,45 @@
 <script setup lang="ts">
-	import { useRoute } from 'vue-router';
+	import { ref, reactive } from 'vue';
+	import { useRoute, useRouter } from 'vue-router';
 	import Navbar from '../components/Navbar.vue';
+	import Modal from '../components/Modal.vue';
 	import useMovieStore from '../stores/MovieStore';
 
 	const store = useMovieStore();
 	const route = useRoute();
-
-	const movie = store.getMovieById(parseInt(route.params.movieId as string));
+	const router = useRouter();
 
 	function getRatingColor() {
-		if (movie.rating > 7) return '#5eb85e';
-		if (movie.rating > 4) return '#ffa809';
+		if (form.rating > 7) return '#5eb85e';
+		if (form.rating > 4) return '#ffa809';
 		return '#e10505';
+	}
+
+	const isShowModal = ref(false);
+	const movie = store.getMovieById(parseInt(route.params.movieId as string));
+	const movieForm = ref<HTMLFormElement | null>(null);
+	const form = reactive({
+		...movie,
+	});
+
+	function updateMovie() {
+		store.updateMovie(form.id, {
+			...form,
+		});
+		toggleModal();
+	}
+
+	function deleteMovie() {
+		store.deleteMovie(parseInt(route.params.movieId as string));
+		router.push('/');
+	}
+
+	function toggleModal() {
+		isShowModal.value = !isShowModal.value;
+	}
+
+	function addActor() {
+		form.actors.push({ name: '' });
 	}
 </script>
 
@@ -21,45 +49,156 @@
 		<div id="movie-preview">
 			<div id="movie-container">
 				<div id="movie-poster">
-					<img :src="movie.poster" alt="Movie poster" />
+					<img :src="form.poster" alt="Movie poster" />
 				</div>
 
 				<div id="movie-info">
 					<div>
-						<h1>{{ movie.name }}</h1>
-						<h3>{{ movie.year }}</h3>
-						<h3>{{ movie.genre }}</h3>
+						<h1>{{ form.name }}</h1>
+						<h3>{{ form.year }}</h3>
+						<h3>{{ form.genre }}</h3>
 						<h3>
 							<span
 								id="movie-rating"
 								:style="{ 'background-color': getRatingColor() }"
-								>{{ movie.rating }}</span
+								>{{ form.rating }}</span
 							>
 						</h3>
-						<h3>Budget {{ movie.budget }}</h3>
-						<h3>Box Office: {{ movie.boxOffice }}</h3>
+						<h3>Budget {{ form.budget }}</h3>
+						<h3>Box Office: {{ form.boxOffice }}</h3>
 						<h3>
 							Actors:
-							<span v-for="(actor, index) in movie.actors" :key="index">{{
+							<span v-for="(actor, index) in form.actors" :key="index">{{
 								actor.name
 							}}</span>
 						</h3>
 						<h3>
 							<strong>Story Line</strong>
-							{{ movie.storyline }}
+							{{ form.storyline }}
 						</h3>
 					</div>
 					<div id="options">
-						<button class="edit">Edit</button>
-						<button class="delete">Delete</button>
+						<button class="edit" @click="toggleModal">Edit</button>
+						<button class="delete" @click="deleteMovie">Delete</button>
 					</div>
 				</div>
 			</div>
 		</div>
+
+		<Modal v-if="isShowModal" v-on:close-modal="toggleModal">
+			<template v-slot:header>
+				<h3 class="m-0">Create new movie</h3>
+			</template>
+			<template v-slot:body>
+				<form @submit.prevent="updateMovie" ref="movieForm" id="movie-form">
+					<p>Fill out the details bellow</p>
+					<input required v-model="form.name" type="text" placeholder="Name" />
+					<input
+						required
+						v-model="form.year"
+						type="number"
+						placeholder="Year" />
+					<input
+						required
+						v-model="form.rating"
+						type="number"
+						placeholder="Rating" />
+					<input
+						required
+						v-model="form.genre"
+						type="text"
+						placeholder="Genre" />
+					<input
+						required
+						v-model="form.budget"
+						type="text"
+						placeholder="Budget" />
+					<input
+						required
+						v-model="form.boxOffice"
+						type="text"
+						placeholder="Box Office" />
+					<input
+						required
+						v-model="form.poster"
+						type="text"
+						placeholder="Poster" />
+					<hr />
+					<div>
+						<div id="actor-input">
+							<p class="m-0">Actors</p>
+							<span @click="addActor" class="add-actor">+</span>
+						</div>
+
+						<input
+							required
+							v-for="(_, index) in form.actors"
+							:key="index"
+							v-model="form.actors[index].name"
+							type="text"
+							placeholder="Actor" />
+					</div>
+
+					<hr />
+
+					<textarea
+						required
+						v-model="form.storyline"
+						placeholder="storyline"
+						rows="6"></textarea>
+				</form>
+			</template>
+			<template v-slot:footer>
+				<button id="update-movie" @click="movieForm!.requestSubmit()">
+					Update
+				</button>
+			</template>
+		</Modal>
 	</div>
 </template>
 
 <style lang="scss" scoped>
+	#movie-form {
+		display: flex;
+		flex-direction: column;
+		text-align: left;
+
+		& > div {
+			display: flex;
+			flex-direction: column;
+
+			#actor-input {
+				display: flex;
+				justify-content: space-between;
+			}
+		}
+
+		.add-actor {
+			background-color: green;
+			text-align: center;
+			color: white;
+			margin-left: 5px;
+			height: 100%;
+			padding: 2px 10px;
+			font-size: 20px;
+			padding: 1re;
+			align-self: center;
+			cursor: pointer;
+		}
+	}
+
+	#update-movie {
+		background-color: #5eb85e;
+		border: none;
+		padding: 5px;
+		width: 70px;
+		color: white;
+		border-radius: 10px;
+		cursor: pointer;
+		text-transform: uppercase;
+		outline: none;
+	}
+
 	#movie-preview {
 		display: flex;
 		overflow: auto;
