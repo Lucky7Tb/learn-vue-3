@@ -1,10 +1,15 @@
 <script setup lang="ts">
+	import { onBeforeMount } from 'vue';
 	import { useRouter } from 'vue-router';
 	import useMovieStore from '../stores/MovieStore';
 	import Movie from '../components/Movie.vue';
 
 	const router = useRouter();
 	const store = useMovieStore();
+
+	onBeforeMount(() => {
+		store.fetchMovie();
+	});
 </script>
 
 <template>

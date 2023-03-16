@@ -33,12 +33,15 @@
 	}
 
 	function addMovie() {
-		store.addMovie({
-			...form,
-			year: parseInt(form.year),
-			rating: parseInt(form.rating),
-		});
-		toggleModal();
+		store
+			.addMovie({
+				...form,
+				year: parseInt(form.year),
+				rating: parseInt(form.rating),
+			})
+			.then(() => {
+				toggleModal();
+			});
 	}
 </script>
 

@@ -1,37 +1,39 @@
 <script setup lang="ts">
-	import { ref, reactive } from 'vue';
+	import { ref, reactive, onBeforeMount } from 'vue';
 	import { useRoute, useRouter } from 'vue-router';
 	import Navbar from '../components/Navbar.vue';
 	import Modal from '../components/Modal.vue';
 	import useMovieStore from '../stores/MovieStore';
+	import { IMovie } from '../stores/MovieStore';
 
 	const store = useMovieStore();
 	const route = useRoute();
 	const router = useRouter();
 
 	function getRatingColor() {
-		if (form.rating > 7) return '#5eb85e';
-		if (form.rating > 4) return '#ffa809';
+		if (form.value.rating > 7) return '#5eb85e';
+		if (form.value.rating > 4) return '#ffa809';
 		return '#e10505';
 	}
-
 	const isShowModal = ref(false);
-	const movie = store.getMovieById(parseInt(route.params.movieId as string));
+	let movie: IMovie;
+	let form = ref({} as IMovie);
 	const movieForm = ref<HTMLFormElement | null>(null);
-	const form = reactive({
-		...movie,
-	});
 
 	function updateMovie() {
-		store.updateMovie(form.id, {
-			...form,
-		});
-		toggleModal();
+		store
+			.updateMovie(form.value.id as string, {
+				...form.value,
+			})
+			.then(() => {
+				toggleModal();
+			});
 	}
 
 	function deleteMovie() {
-		store.deleteMovie(parseInt(route.params.movieId as string));
-		router.push('/');
+		store.deleteMovie(route.params.movieId as string).then(() => {
+			router.push('/');
+		});
 	}
 
 	function toggleModal() {
@@ -39,8 +41,17 @@
 	}
 
 	function addActor() {
-		form.actors.push({ name: '' });
+		form.value.actors.push({ name: '' });
 	}
+
+	onBeforeMount(async () => {
+		movie = (await store.getMovieById(
+			route.params.movieId as string
+		)) as IMovie;
+
+		if (!movie) router.push('/');
+		form.value = { ...movie };
+	});
 </script>
 
 <template>
